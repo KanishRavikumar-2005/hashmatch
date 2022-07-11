@@ -5,6 +5,18 @@ from rich.tree import Tree
 from rich.table import Table
 from hashlib import *
 from rich.prompt import Prompt
+import os
+
+# list to store txt files
+res = []
+# os.walk() returns subdirectories, file from current directory and 
+# And follow next directory from subdirectory list recursively until last directory
+for root, dirs, files in os.walk(r"wordlists"):
+    for file in files:
+        if file.endswith(".txt"):
+            res.append(file)
+
+
 console = Console()
 
 try:
@@ -94,11 +106,18 @@ try:
         print(f"[[cyan]{index}[/cyan]] [magenta]{password}[/magenta] : [green]{hashed}[/green]({fin})")
 
 
-    tree = Tree("Wordlist Tree")
-    tree.add("all.txt ([blue]Passwords[/blue] : [yellow]720302[/yellow])")
-    tree.add("leaked_email_2014.txt ([blue]Passwords[/blue] : [red]16010465[/red])")
-    tree.add("rockyou.txt ([blue]Passwords[/blue] : [red]14344392[/red])")
-    tree.add("wordlist.txt ([blue]Passwords[/blue] : [green]7776[/green])")
+    tree = Tree("wordlists")
+    for file in res:
+        with console.status(f"[bold green]Fetching data from [blue]{file}[/blue]") as status:
+            lent = str(sum(1 for line in open(f'wordlists/{file}', 'r', encoding='latin-1')))
+            if len(lent)>0 and len(lent)<=5:
+                lens = f"[green]{lent}[/green]"
+            elif len(lent)> 5 and len(lent)<=7:
+                lens = f"[yellow]{lent}[/yellow]"
+            elif len(lent)> 7:
+                lens = f"[red]{lent}[/red]"
+            tree.add(f"{file} ([blue]Passwords[/blue] : {lens})")
+
 
     print(tree)
 
